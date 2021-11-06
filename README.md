@@ -4,7 +4,7 @@ The purpose of this smart contract is to let two parties have an on-chain real c
 The process will be as follows:
 1.	The owner of the contract can add new judges to the pool of judges or delete them.
 2.	The entity who will be providing Ether as guarantee will create the Disputeable Contract where he will enter the address of the other party and send also the Ether value that will be held as a guarantee. After creating the Disputeable Contract, the user will get an id to refer to it.
-3.	The judges will be chosen randomly from a pool or judges that can be controlled by the smart contract owner.
+3.	The judges will be chosen randomly from a pool of judges that can be controlled by the smart contract owner.
 4.	The second party will have to sign the contract to make the Disputeable Contract valid.
 5.	The first party can withdraw their Ether as long as the second party did not sign the Disputeable Contract.
 6.	Once the second party signs the Disputeable Contract, they will be able to release the held Ether manually according to the agreement they have with the first party.
