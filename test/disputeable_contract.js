@@ -6,16 +6,21 @@
 // contract.getPastEvents("allEvents", {fromBlock: 0, toBlock: "latest"})
 // .then(console.log)  
 
+// The includeds tests do the followings:
+// 1. Check if we have owner
+// 2. Allow owner to add a judge
+// 3. Prevent non-owner from adding a judge
+// 4. Allow users to create a disputeable contract
+// 5. Allow second party to sign the disputeable contract
+// 6. Prevent others from signing a disputeable contract
+// 7. Allow first party to withdraw the guarantee when the contract is not signed yet
+// 8. Prevent first party from withdrawing the guarantee when the contract is signed
+// 9. Prevent others from withdrawing the guarantee when the contract is not signed
 
 const DisputeableContract = artifacts.require("DisputeableContract");
 let BN = web3.utils.BN;
 const truffleAssert = require('truffle-assertions');
 
-/*
- * uncomment accounts to access the test accounts made available by the
- * Ethereum client
- * See docs: https://www.trufflesuite.com/docs/truffle/testing/writing-tests-in-javascript
- */
 contract("DisputeableContract", function (accounts) {
   const [_owner, alice, bob, judge1, judge2, judge3, judge4, badUser] = accounts;
   const emptyAddress = "0x0000000000000000000000000000000000000000";
