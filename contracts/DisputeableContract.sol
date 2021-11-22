@@ -76,18 +76,6 @@ contract DisputeableContract is Owned{
     _;
   }
 
-  // modifier firstPartyOrJudge(uint256 _id){
-  //   require((disputeableContracts[_id].first_party == msg.sender) || (disputeableContracts[_id].judge1 == msg.sender) ||
-  //    (disputeableContracts[_id].judge2 == msg.sender) || (disputeableContracts[_id].judge3 == msg.sender)); 
-  //   _;
-  // }
-
-  // modifier secondPartyOrJudge(uint256 _id){
-  //   require((disputeableContracts[_id].second_party == msg.sender) || (disputeableContracts[_id].judge1 == msg.sender) ||
-  //    (disputeableContracts[_id].judge2 == msg.sender) || (disputeableContracts[_id].judge3 == msg.sender)); 
-  //   _;
-  // }
-
   modifier hasValue(uint256 _id){
     require(disputeableContracts[_id].guaranteeValue > 0);
     _;
@@ -110,7 +98,7 @@ contract DisputeableContract is Owned{
 
   // Logs
   /// <LogDisputableContractCreated event: _id arg>
-  event LogDisputableContractCreated(uint256 _id, address secondParty, uint256 value, address judge1, address judge2, address judge3);
+  event LogDisputableContractCreated(uint256 _id, address firstParty, address secondParty, uint256 value, address judge1, address judge2, address judge3);
   // <LogDisputableContractSignedBySecondParty event: _id arg>
   event LogDisputableContractSignedBySecondParty(uint256 _id);
   // <LogGuaranteeValueReleasedToFirstPart event: _id arg>
@@ -136,9 +124,9 @@ contract DisputeableContract is Owned{
   /// <LogGuaranteePaidByJudgesDecision event: _id arg>
   event LogGuaranteePaidByJudgesDecision(uint256 _id);
   /// <LogJudgeAdded event: _address arg>
-  event LogJudgeAdded(address _address);
+  event LogJudgeAdded(address _address, uint256 _judgeId);
   /// <LogJudgeDeleted event: _id arg>
-  event LogJudgeDeleted(uint256 _id);
+  event LogJudgeDeleted(uint256 _id, uint256 _judgeId);
 
   constructor(){
   }
@@ -163,7 +151,7 @@ contract DisputeableContract is Owned{
   function addJudge(address _judgeAddress) public isOwner() returns(uint256){
     judges[judgeId] = _judgeAddress;
     judgesCount = judgesCount + 1;
-    emit LogJudgeAdded(_judgeAddress);
+    emit LogJudgeAdded(_judgeAddress, judgeId);
     return judgeId++;
   }
   /// @notice Removing a judge from the pool of judges by the owner only
@@ -171,7 +159,7 @@ contract DisputeableContract is Owned{
   function removeJudge(uint256 _judgeId) isOwner() public{
     require(judges[_judgeId] != address(0));
     delete judges[_judgeId];
-    emit LogJudgeDeleted(_judgeId);
+    emit LogJudgeDeleted(_judgeAddress, _judgeId);
     judgesCount--;
   }
   /// @notice Creating a disputeable contract and add it to the disputeable contract mapping. 
@@ -207,7 +195,7 @@ contract DisputeableContract is Owned{
       guaranteeValue: msg.value,
       judgesEarnings: judgesEarnings
     });
-    emit LogDisputableContractCreated(disputeableContractId, _secondParty, msg.value, judge1, judge2, judge3);
+    emit LogDisputableContractCreated(disputeableContractId, msg.sender ,_secondParty, msg.value, judge1, judge2, judge3);
     return disputeableContractId++;
   }
   /// @notice Sign the contract by second party to make it valid
@@ -302,7 +290,6 @@ contract DisputeableContract is Owned{
       disputeableContracts[id].judge1Decided = true;
       disputeableContracts[id].realeseDecisionByJudge1 = releaseDecision;
       disputeableContracts[id].guaranteeValue -= disputeableContracts[id].judgesEarnings;
-      payable(disputeableContracts[id].judge1).transfer(disputeableContracts[id].judgesEarnings);
       emit LogJudgeMadeDecision(id);  
       if(disputeableContracts[id].judge2Decided && disputeableContracts[id].judge3Decided)
       {
@@ -314,6 +301,10 @@ contract DisputeableContract is Owned{
               // release money to the first party as decision made by majority of judges
               uint256 value = disputeableContracts[id].guaranteeValue;
               disputeableContracts[id].guaranteeValue = 0;
+              payable(disputeableContracts[id].judge1).transfer(disputeableContracts[id].judgesEarnings);
+              payable(disputeableContracts[id].judge2).transfer(disputeableContracts[id].judgesEarnings);
+              payable(disputeableContracts[id].judge3).transfer(disputeableContracts[id].judgesEarnings);
+
               payable(disputeableContracts[id].first_party).transfer(value);
               emit LogFinalDecisionMade(id);
               emit LogGuaranteeReleasedByJudgesDecision(id);
@@ -323,6 +314,9 @@ contract DisputeableContract is Owned{
               // pay money to the second party as decision made by majority of judges
               uint256 value = disputeableContracts[id].guaranteeValue;
               disputeableContracts[id].guaranteeValue = 0;
+              payable(disputeableContracts[id].judge1).transfer(disputeableContracts[id].judgesEarnings);
+              payable(disputeableContracts[id].judge2).transfer(disputeableContracts[id].judgesEarnings);
+              payable(disputeableContracts[id].judge3).transfer(disputeableContracts[id].judgesEarnings);
               payable(disputeableContracts[id].second_party).transfer(value);
               emit LogFinalDecisionMade(id);
               emit  LogGuaranteePaidByJudgesDecision(id);
@@ -336,7 +330,6 @@ contract DisputeableContract is Owned{
       disputeableContracts[id].judge2Decided = true;
       disputeableContracts[id].realeseDecisionByJudge2 = releaseDecision;
       disputeableContracts[id].guaranteeValue -= disputeableContracts[id].judgesEarnings;
-      payable(disputeableContracts[id].judge2).transfer(disputeableContracts[id].judgesEarnings);
       emit LogJudgeMadeDecision(id);
       if(disputeableContracts[id].judge1Decided && disputeableContracts[id].judge3Decided)
       {
@@ -348,6 +341,9 @@ contract DisputeableContract is Owned{
               // release money to the first party as decision made by majority of judges
               uint256 value = disputeableContracts[id].guaranteeValue;
               disputeableContracts[id].guaranteeValue = 0;
+              payable(disputeableContracts[id].judge1).transfer(disputeableContracts[id].judgesEarnings);
+              payable(disputeableContracts[id].judge2).transfer(disputeableContracts[id].judgesEarnings);
+              payable(disputeableContracts[id].judge3).transfer(disputeableContracts[id].judgesEarnings);
               payable(disputeableContracts[id].first_party).transfer(value);
               emit LogFinalDecisionMade(id);
               emit LogGuaranteeReleasedByJudgesDecision(id);
@@ -357,6 +353,9 @@ contract DisputeableContract is Owned{
               // pay money to the second party as decision made by majority of judges
               uint256 value = disputeableContracts[id].guaranteeValue;
               disputeableContracts[id].guaranteeValue = 0;
+              payable(disputeableContracts[id].judge1).transfer(disputeableContracts[id].judgesEarnings);
+              payable(disputeableContracts[id].judge2).transfer(disputeableContracts[id].judgesEarnings);
+              payable(disputeableContracts[id].judge3).transfer(disputeableContracts[id].judgesEarnings);
               payable(disputeableContracts[id].second_party).transfer(value);
               emit LogFinalDecisionMade(id);
               emit  LogGuaranteePaidByJudgesDecision(id);
@@ -370,7 +369,6 @@ contract DisputeableContract is Owned{
       disputeableContracts[id].judge3Decided = true;
       disputeableContracts[id].realeseDecisionByJudge3 = releaseDecision;
       disputeableContracts[id].guaranteeValue -= disputeableContracts[id].judgesEarnings;
-      payable(disputeableContracts[id].judge3).transfer(disputeableContracts[id].judgesEarnings);
       emit LogJudgeMadeDecision(id);
       if(disputeableContracts[id].judge1Decided && disputeableContracts[id].judge2Decided)
       {
@@ -382,6 +380,9 @@ contract DisputeableContract is Owned{
               // release money to the first party as decision made by majority of judges
               uint256 value = disputeableContracts[id].guaranteeValue;
               disputeableContracts[id].guaranteeValue = 0;
+              payable(disputeableContracts[id].judge1).transfer(disputeableContracts[id].judgesEarnings);
+              payable(disputeableContracts[id].judge2).transfer(disputeableContracts[id].judgesEarnings);
+              payable(disputeableContracts[id].judge3).transfer(disputeableContracts[id].judgesEarnings);
               payable(disputeableContracts[id].first_party).transfer(value);
               emit LogFinalDecisionMade(id);
               emit LogGuaranteeReleasedByJudgesDecision(id);
@@ -391,6 +392,9 @@ contract DisputeableContract is Owned{
               // pay money to the second party as decision made by majority of judges
               uint256 value = disputeableContracts[id].guaranteeValue;
               disputeableContracts[id].guaranteeValue = 0;
+              payable(disputeableContracts[id].judge1).transfer(disputeableContracts[id].judgesEarnings);
+              payable(disputeableContracts[id].judge2).transfer(disputeableContracts[id].judgesEarnings);
+              payable(disputeableContracts[id].judge3).transfer(disputeableContracts[id].judgesEarnings);
               payable(disputeableContracts[id].second_party).transfer(value);
               emit LogFinalDecisionMade(id);
               emit  LogGuaranteePaidByJudgesDecision(id);
