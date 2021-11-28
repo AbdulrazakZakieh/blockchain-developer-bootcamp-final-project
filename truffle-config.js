@@ -18,10 +18,15 @@
  *
  */
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
-//
-// const fs = require('fs');
-// const mnemonic = fs.readFileSync(".secret").toString().trim();
+
+// the tool to derive a private key and address from a mnemonic.
+const HDWalletProvider = require('@truffle/hdwallet-provider'); 
+// will allow you to easily deploy contracts to Ethereum 
+const infuraURL = 'https://rinkeby.infura.io/v3/yourifuraprojectid';
+const dotenv = require('dotenv');
+dotenv.config();
+const mnemonic = process.env.MNEMONIC;
+
 
 module.exports = {
   /**
@@ -46,6 +51,15 @@ module.exports = {
     //  port: 8545,            // Standard Ethereum port (default: none)
     //  network_id: "*",       // Any network (default: none)
     // },
+    rinkeby: {
+      provider: () => new HDWalletProvider(mnemonic, infuraURL),
+      network_id: '4',          // Rinkeby's network id
+      gas: 5500000,      
+      networkCheckTimeout: 10000000,  
+      confirmations: 0, // # of confs to wait between deployments. (default: 0)
+      timeoutBlocks: 200, // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true, // Skip dry run before migrations? (default: false for public nets )
+    },  
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
