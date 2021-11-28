@@ -30,6 +30,12 @@ https://youtu.be/abizFRhtE1I
 **Running Tests:**
 - Run truffle test
 
+**Migrating the contracts to Rinkeby:**
+- Put your infura project id in line 25 in truffle-config.js file.
+- Put your secret recovery phrase in the .env file like this:
+  - MNEMONIC="your secret recovery phrase"
+- Run truffle migrate --network rinkeby
+
 **TODO:**
 - Make sure no judges has been selected twice for the same disputeable contract
 - Make sure the selected judge is not one of the parties
