@@ -140,7 +140,7 @@ contract("DisputeableContract", function (accounts) {
     } catch {
 
     }
-    const _disputeableContract = await instance.showDisputeableContract.call(0);
+    const _disputeableContract = await instance.showDisputeableContract(0);
     assert.notEqual(_disputeableContract[10], 0, 'the guarantee returned');
   });
 
