@@ -11,6 +11,9 @@ The process will be as follows:
 7.	At any time, if the Ether is not released, any party can ask for dispute resolution.
 8.	When a dispute resolution is filled, the judges will have to refer to the on-chain real contract to make a judge whether to release the held Ether or pay it to the second party.
 9.	Each judge receives a percentage of the held Ether to compensate them for the time spent on judging and the Gas used to send the final decision to the blockchain.
+<p align="center">
+  <img src="https://abdulrazakzakieh.com/contract/about.png" width="100%" alt="disputeable contract">
+</p>
 
 **Public Ethereum Account:**
 0x0695939B01390aF18b6B4C3A520aC36129c79FF0
