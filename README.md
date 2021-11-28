@@ -36,6 +36,12 @@ https://youtu.be/abizFRhtE1I
   - MNEMONIC="your secret recovery phrase"
 - Run truffle migrate --network rinkeby
 
+**Directory Structure:**
+- frontend: The webpages used to interact with the smart contract (HTML/CSS/JS)
+- contracts: The disputeable contract code in solidity
+- migrations: Migration files to deploy the contracts
+- test: The unit tests for Disputeable Contract (9 tests)
+
 **TODO:**
 - Make sure no judges has been selected twice for the same disputeable contract
 - Make sure the selected judge is not one of the parties
