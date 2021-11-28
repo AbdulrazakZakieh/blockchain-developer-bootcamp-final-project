@@ -30,5 +30,6 @@ https://youtu.be/abizFRhtE1I
 **Running Tests:**
 - Run truffle test
 
-
-
+**TODO:**
+- Make sure no judges has been selected twice for the same disputeable contract
+- Make sure the selected judge is not one of the parties
