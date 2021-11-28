@@ -46,48 +46,48 @@ contract DisputeableContract is Owned{
   uint256 judgesCount;
 
   modifier isOwner() { 
-    require(owner == msg.sender); 
+    require(owner == msg.sender, 'You are not the owner of this smart contract'); 
     _;
   }
 
   modifier signed(uint256 id) {
-    require(disputeableContracts[id].signedBySecondParty == true);
+    require(disputeableContracts[id].signedBySecondParty == true, 'The disputeable contract you are trying to access is not signed by second party');
     _;
   }
 
   modifier notSigned(uint256 id) {
-    require(disputeableContracts[id].signedBySecondParty == false);
+    require(disputeableContracts[id].signedBySecondParty == false, 'The disputeable contract you are trying to access is signed by second party');
     _;
   }
 
   modifier judge(uint256 _id) { 
     require((disputeableContracts[_id].judge1 == msg.sender) ||
-     (disputeableContracts[_id].judge2 == msg.sender) || (disputeableContracts[_id].judge3 == msg.sender)); 
+     (disputeableContracts[_id].judge2 == msg.sender) || (disputeableContracts[_id].judge3 == msg.sender), 'You are not a judge for this disputeable contract'); 
     _;
   }
 
   modifier firstParty(uint256 _id){
-    require(disputeableContracts[_id].first_party == msg.sender); 
+    require(disputeableContracts[_id].first_party == msg.sender, 'You are not the first party for this disputeable contract'); 
     _;
   }
 
   modifier secondParty(uint256 _id){
-    require(disputeableContracts[_id].second_party == msg.sender); 
+    require(disputeableContracts[_id].second_party == msg.sender, 'You are not the second party for this disputeable contract'); 
     _;
   }
 
   modifier hasValue(uint256 _id){
-    require(disputeableContracts[_id].guaranteeValue > 0);
+    require(disputeableContracts[_id].guaranteeValue > 0, 'This disputeable contract has no value');
     _;
   }
 
   modifier hasThreeJudges(){
-    require(judgesCount >= 3);
+    require(judgesCount >= 3, 'The smart contract has less than 3 judges');
     _;
   }
 
   modifier disputeable(uint256 id){
-    require(disputeableContracts[id].disputeRequestByParty1 == true || disputeableContracts[id].disputeRequestByParty2 == true);
+    require(disputeableContracts[id].disputeRequestByParty1 == true || disputeableContracts[id].disputeRequestByParty2 == true, 'This disputeable contract has not been asked to be resolved');
     _;
   }
 
@@ -126,7 +126,7 @@ contract DisputeableContract is Owned{
   /// <LogJudgeAdded event: _address arg>
   event LogJudgeAdded(address _address, uint256 _judgeId);
   /// <LogJudgeDeleted event: _id arg>
-  event LogJudgeDeleted(uint256 _id, uint256 _judgeId);
+  event LogJudgeDeleted(address _judgeAddress, uint256 _judgeId);
 
   constructor(){
   }
@@ -158,8 +158,8 @@ contract DisputeableContract is Owned{
   /// @param _judgeId The judge id that we want to remove
   function removeJudge(uint256 _judgeId) isOwner() public{
     require(judges[_judgeId] != address(0));
+    emit LogJudgeDeleted(judges[_judgeId], _judgeId);
     delete judges[_judgeId];
-    emit LogJudgeDeleted(_judgeAddress, _judgeId);
     judgesCount--;
   }
   /// @notice Creating a disputeable contract and add it to the disputeable contract mapping. 
