@@ -31,7 +31,8 @@ https://youtu.be/abizFRhtE1I
 - truffle
 
 **Running Tests:**
-- Run truffle test
+-  npm install
+-  truffle test
 
 **Migrating the contracts to Rinkeby:**
 - Put your infura project id in line 25 in truffle-config.js file.
